@@ -53,6 +53,7 @@ certifi = "2023.7.22"
 cryptography = "41.0.6"
 grpcio = "1.56.2"
 urllib3 = "1.26.18"
+websockets = "^12.0"
 
 [tool.pytest.ini_options]
 pythonpath = [
