@@ -19,6 +19,7 @@ cachetools = "^5.3.1"
 passlib = "^1.7.4"
 python-multipart = "^0.0.6"
 bcrypt = "^4.0.1"
+gunicorn = "^21.2.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.2.0"
@@ -52,6 +53,6 @@ help = "run tests using pytest"
 
 [tool.poe.tasks.start]
 shell = """
-gunicorn -b :8080 --reload -w 2 -k uvicorn.workers.UvicornWorker auth_service:app
+gunicorn -b :8080 --reload -w 2 -k uvicorn.workers.UvicornWorker auth_service:auth_app
 """
 help = "start the server for local development"
