@@ -36,6 +36,7 @@ jb-translator = {path = "../packages/jb-translator", develop = true}
 jb-speech-processor = {path = "../packages/jb-speech-processor", develop = true}
 jb-feedback = {path = "../packages/jb-feedback", develop = true}
 jb-document-collection = {path = "../packages/jb-document-collection", develop = true}
+p6-doc-collection = {path = "../p6-packages/p6-doc-collection", develop = true}
 pymupdf = "1.22.3"
 python-docx = "^0.8.11"
 docx2txt = "^0.8"
@@ -92,7 +93,7 @@ help = "run tests using pytest"
 
 [tool.poe.tasks.start]
 shell = """
-gunicorn -b :8080 --reload -w 2 -k uvicorn.workers.UvicornWorker generic_qa.server:app
+gunicorn -b :8080 --preload -w 2 -k uvicorn.workers.UvicornWorker generic_qa.server:app
 """
 help = "start the server for local development"
 

@@ -1,0 +1,64 @@
+Certificate Request:
+    Data:
+        Version: 1 (0x0)
+        Subject: C = IN, ST = MH, L = PUNE, O = PIXEL^, OU = 21, CN = Diga, emailAddress = digambar@thinkoverit.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+                Modulus:
+                    00:be:74:fe:46:d5:47:71:47:70:78:77:4f:5a:4c:
+                    4d:92:da:fb:3d:34:b2:e3:5b:ea:73:ad:70:0e:62:
+                    8e:fc:f4:8b:78:1e:84:e0:70:7a:08:21:69:06:ce:
+                    b1:51:f4:94:fa:f9:60:d5:cd:dd:3c:26:d2:42:16:
+                    58:a1:50:7f:14:11:0f:c1:cc:e9:87:88:e1:7c:80:
+                    f1:26:3e:e2:90:a5:a6:ae:ed:9b:41:c3:ae:fe:b2:
+                    f7:3d:94:19:3a:c2:3f:1b:f3:44:c3:45:02:95:0e:
+                    94:20:88:d7:ef:6f:fd:e1:c1:4d:d9:e2:29:f7:7e:
+                    24:ca:a9:75:ea:9f:09:3d:8f:75:40:77:21:ff:c9:
+                    3b:1b:36:4e:20:7f:cf:d1:5a:cf:88:a0:be:30:9f:
+                    bb:c0:a1:ba:ef:4a:bc:c4:aa:4e:fe:a7:3c:39:ec:
+                    60:91:eb:e0:38:2c:3b:53:02:4c:b8:6e:b5:0d:c3:
+                    59:77:3a:76:c5:01:9e:f8:ea:f5:8d:e3:5e:ba:9f:
+                    85:ab:0a:96:61:dd:e6:48:1e:4a:1b:3a:88:3c:0a:
+                    44:84:e2:e6:51:be:91:51:c0:bf:ce:f3:c2:88:23:
+                    81:76:b1:63:8b:a3:14:1b:02:3d:96:b5:58:03:ac:
+                    6c:4a:b7:68:2c:4b:85:cc:a1:4c:9e:e4:fd:0a:de:
+                    d5:fd
+                Exponent: 65537 (0x10001)
+        Attributes:
+            challengePassword        :password
+            unstructuredName         :pixel6
+    Signature Algorithm: sha256WithRSAEncryption
+         56:15:01:21:5e:91:8c:5b:0b:21:6b:96:09:1b:d3:8b:1b:5f:
+         19:a5:6a:1d:b9:29:cb:3b:ae:e8:62:7d:71:56:6b:50:4e:84:
+         e9:3d:c2:33:10:78:22:b9:55:8e:cb:e2:88:45:51:7f:b5:fe:
+         99:4a:e0:dd:48:8c:36:66:d9:c1:40:5e:ce:a9:4b:47:6c:ec:
+         8e:30:42:ce:73:66:df:2a:34:2a:62:f4:6a:75:84:3d:90:4f:
+         a0:20:90:dc:09:4d:23:49:20:3a:35:8a:e8:90:e6:a3:bd:dd:
+         0b:a9:22:5f:c4:bf:cd:ec:d1:ae:b8:4b:7f:0a:fb:e1:fa:dd:
+         f0:72:aa:a3:9d:b5:17:cb:cf:d2:f5:68:0e:f1:a4:3a:48:15:
+         27:77:33:df:39:db:20:fe:3b:37:c4:e4:e9:33:60:93:1b:58:
+         d4:cd:f0:cd:dd:75:a7:aa:b6:2b:a7:5a:89:fb:50:bd:c9:dd:
+         0f:2a:60:49:fd:2f:12:cc:5a:c6:87:3f:07:76:8a:04:30:2b:
+         35:03:39:00:4c:e7:6d:f3:0d:ce:95:b8:42:65:31:01:5d:7d:
+         64:2b:41:2b:79:c5:5c:51:e3:27:e5:e8:d7:0f:e6:8e:96:a2:
+         4e:25:8a:13:2f:90:9b:c8:37:45:a0:41:67:0c:7c:27:17:71:
+         11:59:80:48
+-----BEGIN CERTIFICATE REQUEST-----
+MIIC9DCCAdwCAQAwfzELMAkGA1UEBhMCSU4xCzAJBgNVBAgMAk1IMQ0wCwYDVQQH
+DARQVU5FMQ8wDQYDVQQKDAZQSVhFTF4xCzAJBgNVBAsMAjIxMQ0wCwYDVQQDDARE
+aWdhMScwJQYJKoZIhvcNAQkBFhhkaWdhbWJhckB0aGlua292ZXJpdC5jb20wggEi
+MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC+dP5G1UdxR3B4d09aTE2S2vs9
+NLLjW+pzrXAOYo789It4HoTgcHoIIWkGzrFR9JT6+WDVzd08JtJCFlihUH8UEQ/B
+zOmHiOF8gPEmPuKQpaau7ZtBw67+svc9lBk6wj8b80TDRQKVDpQgiNfvb/3hwU3Z
+4in3fiTKqXXqnwk9j3VAdyH/yTsbNk4gf8/RWs+IoL4wn7vAobrvSrzEqk7+pzw5
+7GCR6+A4LDtTAky4brUNw1l3OnbFAZ746vWN4166n4WrCpZh3eZIHkobOog8CkSE
+4uZRvpFRwL/O88KII4F2sWOLoxQbAj2WtVgDrGxKt2gsS4XMoUye5P0K3tX9AgMB
+AAGgMDAVBgkqhkiG9w0BCQIxCAwGcGl4ZWw2MBcGCSqGSIb3DQEJBzEKDAhwYXNz
+d29yZDANBgkqhkiG9w0BAQsFAAOCAQEAVhUBIV6RjFsLIWuWCRvTixtfGaVqHbkp
+yzuu6GJ9cVZrUE6E6T3CMxB4IrlVjsviiEVRf7X+mUrg3UiMNmbZwUBezqlLR2zs
+jjBCznNm3yo0KmL0anWEPZBPoCCQ3AlNI0kgOjWK6JDmo73dC6kiX8S/zezRrrhL
+fwr74frd8HKqo521F8vP0vVoDvGkOkgVJ3cz3znbIP47N8Tk6TNgkxtY1M3wzd11
+p6q2K6daiftQvcndDypgSf0vEsxaxoc/B3aKBDArNQM5AEznbfMNzpW4QmUxAV19
+ZCtBK3nFXFHjJ+Xo1w/mjpaiTiWKEy+Qm8g3RaBBZwx8JxdxEVmASA==
+-----END CERTIFICATE REQUEST-----

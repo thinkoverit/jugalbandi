@@ -88,7 +88,6 @@ async def get_translator():
                                DhruvaTranslator(),
                                GoogleTranslator())
 
-
 async def get_gpt_index_qa_engine(
     document_collection: Annotated[
         DocumentCollection, Depends(get_document_collection)

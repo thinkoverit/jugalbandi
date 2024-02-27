@@ -1,5 +1,3 @@
-from jugalbandi.core.caching import aiocached
-from jugalbandi.document_collection.doc_db import DOCRepository
 from .server_env import init_env
 from typing import Annotated, List
 from fastapi import FastAPI, UploadFile, Depends, Query, File
@@ -41,7 +39,6 @@ from jugalbandi.feedback import FeedbackRepository
 from .query_with_tfidf import querying_with_tfidf
 from .server_helper import (
     get_api_key,
-    # get_existing_document_collection,
     get_tenant_repository,
     get_feedback_repository,
     get_gpt_index_qa_engine,
@@ -55,6 +52,10 @@ from .server_helper import (
     get_translator,
     User,
 )
+
+from .p6_server import router
+
+
 from prometheus_fastapi_instrumentator import Instrumentator
 import base64
 # from .server_middleware import ApiKeyMiddleware
@@ -102,13 +103,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-Instrumentator().instrument(app).expose(app)
-# app.add_middleware(ApiKeyMiddleware, tenant_repository=get_tenant_repository())
+app.include_router(router, prefix="/p6_server")
 
-@aiocached(cache={})
-async def get_document_repo() -> DOCRepository:
-    document = DOCRepository()
-    return document
+Instrumentator().instrument(app).expose(app)
+# app.add_middleware(ApiKeyMiddleware, tenant_repository=get_tenant_repository()
 
 @app.exception_handler(Exception)
 async def custom_exception_handler(request, exception):
@@ -142,12 +140,10 @@ async def upload_files(
     authorization: Annotated[User, Depends(verify_access_token)],
     api_key: Annotated[APIKey, Depends(get_api_key)],
     files: List[UploadFile],
-    document_name: str,    
     document_repository: Annotated[
         DocumentRepository, Depends(get_document_repository)
     ],
     text_converter: Annotated[TextConverter, Depends(get_text_converter)],
-    doc_db: Annotated[DOCRepository, Depends(get_document_repo)],
 ):
 
     document_collection = document_repository.new_collection()
@@ -155,11 +151,8 @@ async def upload_files(
 
     await document_collection.init_from_files(source_files)
 
-    documents_list = []
     async for filename in document_collection.list_files():
-        documents_list.append(filename)
         await text_converter.textify(filename, document_collection)
-
 
     gpt_indexer = GPTIndexer()
     langchain_indexer = LangchainIndexer()
@@ -167,61 +160,10 @@ async def upload_files(
     await gpt_indexer.index(document_collection)
     await langchain_indexer.index(document_collection)
         
-    await doc_db.insert_document_store(document_name, document_collection.id, documents_list )
-
     return {
-        "document_name": document_name, 
         "uuid_number": document_collection.id,
         "message": "Files uploading is successful",
     }
-
-@app.get(
-    "/get-documents",
-    summary="Get Document list",
-    tags=["Document Store"],
-)
-async def append_files(
-    authorization: Annotated[User, Depends(verify_access_token)],
-    api_key: Annotated[APIKey, Depends(get_api_key)],
-    doc_db: DOCRepository = Depends(get_document_repo),
-):
-    doc_list = await doc_db.get_all_documents()
-    return doc_list
-    
-
-# @app.post(
-#     "/append-files",
-#     summary="Upload files to store the document set for querying",
-#     tags=["Document Store"],
-# )
-# async def append_files(
-#     files: List[UploadFile],
-#     document_data: Annotated[
-#         DocumentRepository, Depends(get_existing_document_collection)],
-#     text_converter: Annotated[TextConverter, Depends(get_text_converter)],
-#     a: Annotated[DOCRepository, Depends(get_document_repo)],
-# ):
-    
-#     # doc_db.get
-
-#     document_collection = document_data.get_collection()
-#     source_files = [DocumentSourceFile(file.filename, file) for file in files]
-
-#     await document_collection.init_from_files(source_files)
-
-#     async for filename in document_collection.list_files():
-#         await text_converter.textify(filename, document_collection)
-
-#     # gpt_indexer = GPTIndexer()
-#     # langchain_indexer = LangchainIndexer()
-
-#     # await gpt_indexer.index(document_collection)
-#     # await langchain_indexer.index(document_collection)
-#     return {
-#         "uuid_number": document_collection.id,
-#         "message": "Files uploading is successful",
-#     }
-
 
 @app.get(
     "/query-with-gptindex",
@@ -240,7 +182,6 @@ async def query_using_gptindex(
         "answer": response.answer,
         "source_text": response.source_text,
     }
-
 
 @app.get(
     "/query-with-langchain",
