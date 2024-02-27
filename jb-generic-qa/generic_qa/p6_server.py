@@ -3,19 +3,24 @@ from fastapi.responses import JSONResponse
 from typing import Annotated, List
 
 from doc_collection.doc_db import DOCRepository
+from fastapi.security.api_key import APIKey
 
 from jugalbandi.core.caching import aiocached
 from jugalbandi.document_collection.repository import DocumentRepository, DocumentSourceFile
 from jugalbandi.qa.indexing import GPTIndexer, LangchainIndexer
 
+from jugalbandi.qa import (
+    GPTIndexer,
+    LangchainIndexer,
+    TextConverter,
+)
+
 from .server_helper import (
     get_api_key,
+    get_text_converter,
     verify_access_token,
     get_document_repository,
-    get_text_converter,
     User,
-    TextConverter,
-    APIKey,
 )
 
 router = APIRouter()
