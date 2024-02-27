@@ -42,6 +42,7 @@ python-docx = "^0.8.11"
 docx2txt = "^0.8"
 scikit-learn = "^1.2.2"
 jb-storage = {path = "../packages/jb-storage", develop = true}
+p6-storage = {path = "../p6-packages/p6-storage", develop = true}
 jb-tenant = {path = "../packages/jb-tenant", develop = true}
 prometheus-fastapi-instrumentator = "^6.1.0"
 azure-cognitiveservices-speech = "^1.32.1"

@@ -62,6 +62,31 @@ class DOCRepository:
                 datetime.now(ZoneInfo("UTC")),
             )
 
+    async def update_document_store(
+        self, document_name, uuid_number, documents_list
+    ):
+        engine = await self._get_engine()
+
+        async with engine.acquire() as connection:
+            await connection.execute(
+                """
+                UPDATE document_store
+                SET documents_list = $1
+                WHERE document_name = $2 AND uuid_number = $3
+                """,
+                documents_list,
+                document_name,
+                uuid_number,
+            )
+
+    async def get_collection(self, doc_id):
+        engine = await self._get_engine()
+
+        async with engine.acquire() as connection:
+            result = await connection.fetchrow(
+                "SELECT * FROM document_store WHERE uuid_number = $1", doc_id
+            )
+            return result
 
     async def get_all_documents(self):
         engine = await self._get_engine()
@@ -69,3 +94,16 @@ class DOCRepository:
         async with engine.acquire() as connection:
             result = await connection.fetch("SELECT * FROM document_store")
             return result
+        
+
+    async def delete_document_by_id(self, doc_id):
+        engine = await self._get_engine()
+
+        async with engine.acquire() as connection:
+            await connection.execute(
+                """
+                DELETE FROM document_store
+                WHERE uuid_number = $1;
+                """,
+                doc_id,
+            )

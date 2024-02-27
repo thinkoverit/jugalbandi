@@ -12,7 +12,7 @@ pydantic = "1.10.13"
 cachetools = "^5.3.1"
 types-cachetools = "^5.3.0.5"
 jb-core = {path = "../../packages/jb-core", develop = true}
-jb-storage = {path = "../../packages/jb-storage", develop = true}
+p6-storage = {path = "../../p6-packages/p6-storage", develop = true}
 aiohttp = "3.9.0"
 certifi = "2023.7.22"
 cryptography = "41.0.6"
