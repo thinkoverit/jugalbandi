@@ -118,7 +118,9 @@ async def update_or_add_document(
     await document_collection.init_from_files(source_files)
 
     async for filename in document_collection.list_files():
-        await text_converter.textify(filename, document_collection)
+        existing_documents_list.append(filename)
+        await text_converter.textify(filename, document_collection) 
+
 
     gpt_indexer = GPTIndexer()
     langchain_indexer = LangchainIndexer()
