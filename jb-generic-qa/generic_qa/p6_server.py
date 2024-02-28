@@ -60,14 +60,13 @@ async def upload_files(
         documents_list.append(filename)
         await text_converter.textify(filename, document_collection)
 
+    await doc_db.insert_document_store(document_name, document_collection.id, documents_list )
 
     gpt_indexer = GPTIndexer()
     langchain_indexer = LangchainIndexer()
 
     await gpt_indexer.index(document_collection)
     await langchain_indexer.index(document_collection)
-        
-    await doc_db.insert_document_store(document_name, document_collection.id, documents_list )
 
     return {
         "document_name": document_name, 
@@ -108,8 +107,10 @@ async def update_or_add_document(
     document_info = await doc_db.get_collection(doc_id)
     if not document_info:
         raise InternalServerException("Document not found")
+    
+    print(document_info)
 
-    existing_documents_list = document_info[0]["documents_list"] if document_info else []
+    existing_documents_list = document_info["documents_list"] if document_info else []
     source_files = [DocumentSourceFile(file.filename, file) for file in files]
     
     document_collection = document_repository.get_collection(doc_id)

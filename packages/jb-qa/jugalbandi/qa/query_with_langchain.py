@@ -37,7 +37,10 @@ async def latent_semantic_analysis(response: str, documents: List):
     vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform(documents)
 
-    svd = TruncatedSVD(n_components=300)
+    # Limit the number of components based on the number of features
+    n_components = min(130, tfidf_matrix.shape[1])
+    svd = TruncatedSVD(n_components=n_components)
+    
     lsa_matrix = svd.fit_transform(tfidf_matrix)
     lsa_matrix = normalize(lsa_matrix)
 

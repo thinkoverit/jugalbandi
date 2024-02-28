@@ -83,10 +83,13 @@ class DOCRepository:
         engine = await self._get_engine()
 
         async with engine.acquire() as connection:
-            result = await connection.fetchrow(
-                "SELECT * FROM document_store WHERE uuid_number = $1", doc_id
+            return await connection.fetchrow(
+                """
+                SELECT * FROM document_store
+                WHERE uuid_number=$1
+                """,
+                doc_id,
             )
-            return result
 
     async def get_all_documents(self):
         engine = await self._get_engine()
