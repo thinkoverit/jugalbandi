@@ -18,7 +18,7 @@ from jugalbandi.qa import (
     TextConverter,
 )
 
-from .server_helper import (
+from .p6_server_helper import (
     get_api_key,
     get_text_converter,
     verify_access_token,
@@ -118,7 +118,8 @@ async def update_or_add_document(
     await document_collection.init_from_files(source_files)
 
     async for filename in document_collection.list_files():
-        existing_documents_list.append(filename)
+        if filename not in existing_documents_list:
+            existing_documents_list.append(filename)
         await text_converter.textify(filename, document_collection) 
 
 
@@ -160,15 +161,14 @@ async def delete_document(
 ):
     
     document_info = await doc_db.get_collection(doc_id)
+
     if not document_info:
         raise InternalServerException("Document not found")
     
-    await doc_db.delete_document_by_id(doc_id)
-
     try:
-
         collection = document_repository.get_collection(doc_id)
         await collection.remove_file(doc_id)
+        await doc_db.delete_document_by_id(doc_id)
 
         return {
             "updated_uuid_number": doc_id,
