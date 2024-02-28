@@ -8,6 +8,7 @@ from doc_collection.repository import ExtendedDocumentCollection
 from fastapi.security.api_key import APIKey
 
 from jugalbandi.core.caching import aiocached
+from jugalbandi.core.errors import InternalServerException
 from jugalbandi.document_collection.repository import DocumentRepository, DocumentSourceFile
 from jugalbandi.qa.indexing import GPTIndexer, LangchainIndexer
 
@@ -106,7 +107,7 @@ async def update_or_add_document(
 ):
     document_info = await doc_db.get_collection(doc_id)
     if not document_info:
-        return JSONResponse(status_code=404, content={"message": "Document not found"})
+        raise InternalServerException("Document not found")
 
     existing_documents_list = document_info[0]["documents_list"] if document_info else []
     source_files = [DocumentSourceFile(file.filename, file) for file in files]
@@ -141,7 +142,7 @@ async def update_or_add_document(
     return {
         "document_name": document_name,
         "updated_uuid_number": document_collection.id,
-        "message": "Document updated or added successfully",
+        "message": message,
     }
 
 @router.delete(
@@ -157,15 +158,20 @@ async def delete_document(
     
     document_info = await doc_db.get_collection(doc_id)
     if not document_info:
-        return JSONResponse(status_code=404, content={"message": "Document not found"})
+        raise InternalServerException("Document not found")
     
     await doc_db.delete_document_by_id(doc_id)
 
     try:
+
         collection = document_repository.get_collection(doc_id)
         await collection.remove_file(doc_id)
-        # await doc_db.delete_document_by_id(doc_id)
-        return {"message": "Document collection deleted successfully"}
+
+        return {
+            "updated_uuid_number": doc_id,
+            "message": "Document collection deleted successfully"
+        }
+    
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to delete file: {str(e)}")
+        raise InternalServerException("Failed to delete file: " + str(e))
 
