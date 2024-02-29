@@ -1,5 +1,5 @@
 import operator
-from typing import Dict
+from typing import Dict, Optional, List, Tuple
 import asyncpg
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -17,6 +17,7 @@ class DOCRepository:
         engine = await self._create_engine()
         await self._create_schema(engine)
         return engine
+
 
     async def _create_engine(self, timeout=5):
         engine = await asyncpg.create_pool(
@@ -37,76 +38,149 @@ class DOCRepository:
                     id SERIAL PRIMARY KEY,
                     document_name TEXT,
                     uuid_number TEXT,
-                    documents_list TEXT[],
                     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
                 );
             """
             )
 
-    async def insert_document_store(
-        self, document_name, uuid_number, documents_list
-    ):
-        engine = await self._get_engine()
-
-        print(f"document_name - {document_name}, uuid_number - {uuid_number}, documents_list - {documents_list}")
-
-        async with engine.acquire() as connection:
-            await connection.execute(
-                f"""
-                INSERT INTO document_store
-                (document_name, uuid_number, documents_list, created_at)
-                VALUES ($1, $2, ARRAY {documents_list}, $3)
-                """,
-                document_name,
-                uuid_number,
-                datetime.now(ZoneInfo("UTC")),
-            )
-
-    async def update_document_store(
-        self, document_name, uuid_number, documents_list
-    ):
-        engine = await self._get_engine()
-
-        async with engine.acquire() as connection:
             await connection.execute(
                 """
-                UPDATE document_store
-                SET documents_list = $1
-                WHERE document_name = $2 AND uuid_number = $3
-                """,
-                documents_list,
-                document_name,
-                uuid_number,
+                CREATE TABLE IF NOT EXISTS file_store (
+                    id SERIAL PRIMARY KEY,
+                    document_id INTEGER REFERENCES document_store(id),
+                    file_name TEXT,
+                    indexing BOOLEAN,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                );
+            """
             )
 
-    async def get_collection(self, doc_id):
+    async def insert_document(
+        self, document_name, uuid_number, documents_list
+    ) -> Optional[int]:
         engine = await self._get_engine()
 
         async with engine.acquire() as connection:
-            return await connection.fetchrow(
-                """
-                SELECT * FROM document_store
-                WHERE uuid_number=$1
-                """,
-                doc_id,
-            )
+            try:
+                document_id = await connection.fetchval(
+                    """
+                    INSERT INTO document_store (document_name, uuid_number) VALUES ($1, $2) RETURNING id
+                    """,
+                    document_name,
+                    uuid_number,
+                )
+                for file_name in documents_list:
+                    await connection.execute(
+                        """
+                        INSERT INTO file_store (document_id, file_name, indexing) VALUES ($1, $2, $3)
+                        """,
+                        document_id,
+                        file_name,
+                        False,
+                    )
+                return document_id
+            except Exception as e:
+                print(f"Error creating document: {e}")
+                return None
 
-    async def get_all_documents(self):
+
+    async def update_document(
+        self, document_id: int, documents_list: List[str]
+    ) -> Optional[int]:        
         engine = await self._get_engine()
 
         async with engine.acquire() as connection:
-            result = await connection.fetch("SELECT * FROM document_store")
-            return result
+            try:
+                await connection.execute(
+                    """
+                    DELETE FROM file_store WHERE document_id=$1
+                    """,
+                    document_id,
+                )
+                for file_name in documents_list:
+                    await connection.execute(
+                        """
+                        INSERT INTO file_store (document_id, file_name, indexing) VALUES ($1, $2, $3)
+                        """,
+                        document_id,
+                        file_name,
+                        False,
+                    )
+                return document_id
+            except Exception as e:
+                print(f"Error updating document: {e}")
+                return None
+
+
+    async def find_by_id(self, document_id: int) -> Optional[tuple[str, str, List[str]]]:
+        engine = await self._get_engine()
+
+        async with engine.acquire() as connection:
+            try:
+                document_uuid, document_name, documents_list = await connection.fetchrow(
+                    """
+                    SELECT document_store.uuid_number, document_store.document_name, array_agg(file_store.file_name) as documents_list 
+                    FROM document_store
+                    JOIN file_store ON document_store.id = file_store.document_id
+                    WHERE document_store.id = $1
+                    GROUP BY document_store.id, document_store.document_name
+                    """,
+                    document_id,
+                )
+                return document_uuid, document_name, documents_list
+            except Exception as e:
+                return None
+
         
 
-    async def delete_document_by_id(self, doc_id):
+    async def get_all_documents(self) -> Optional[List[Tuple[int, str, str, List[str]]]]:
         engine = await self._get_engine()
 
         async with engine.acquire() as connection:
-            await connection.execute(
-                """
-                DELETE FROM document_store
-                WHERE uuid_number = $1;
-                """,
-                doc_id,
-            )
+            try:
+                documents = await connection.fetch(
+                    """
+                    SELECT document_store.uuid_number, document_store.document_name, array_agg(file_store.file_name) as documents_list 
+                    FROM document_store
+                    JOIN file_store ON document_store.id = file_store.document_id
+                    GROUP BY document_store.id, document_store.document_name
+                    """
+                )
+                return [(doc[0], doc[1], doc[2], [file[3] for file in doc[4:]]) for doc in documents]
+            except Exception as e:
+                print(f"Error fetching all documents: {e}")
+                return None
+
+
+
+    async def delete_document_by_id(self, document_id: int) -> bool:
+        engine = await self._get_engine()
+
+        async with engine.acquire() as connection:
+            try:
+                # Delete associated files
+                await connection.execute(
+                    """
+                    DELETE FROM file_store WHERE document_id = $1
+                    """,
+                    document_id,
+                )
+                # Delete document
+                deleted_rows = await connection.execute(
+                    """
+                    DELETE FROM document_store WHERE id = $1
+                    """,
+                    document_id,
+                )
+                return deleted_rows == 1
+            except Exception as e:
+                print(f"Error deleting document with id {document_id}: {e}")
+                return False
+            
+    async def get_uuid_number(self, document_id: int) -> str:
+        engine = await self._get_engine()
+
+        async with engine.acquire() as connection:
+            row = await connection.fetchrow("SELECT uuid_number FROM document_store WHERE id = $1", document_id)
+
+            return row["uuid_number"] if row else None

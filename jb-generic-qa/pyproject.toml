@@ -94,7 +94,7 @@ help = "run tests using pytest"
 
 [tool.poe.tasks.start]
 shell = """
-gunicorn -b :8080 --preload -w 2 -k uvicorn.workers.UvicornWorker generic_qa.server:app
+gunicorn -b :8080 --reload -w 2 -k uvicorn.workers.UvicornWorker generic_qa.server:app
 """
 help = "start the server for local development"
 
