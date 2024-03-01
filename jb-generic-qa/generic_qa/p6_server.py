@@ -31,21 +31,24 @@ async def get_document_repo() -> DOCRepository:
 
 async def get_document_info(document_id: int, doc_db: DOCRepository = Depends(get_document_repo)):
     document_info = await doc_db.find_by_id(document_id)
-    print(document_id)
     if not document_info:
         raise InternalServerException("Document not found")
     return document_info
 
 async def process_files(
         files: List[UploadFile],
-        text_converter: Annotated[TextConverter, Depends(get_text_converter)],
         document_id,
+        document_name,
         document_repository: Annotated[
             DocumentRepository, Depends(get_document_repository)
-        ],):
+        ], 
+        text_converter: Annotated[TextConverter, Depends(get_text_converter)],
+        doc_db: DOCRepository = Depends(get_document_repo)
+    ):
     
     if document_id:
-        document_collection = document_repository.get_collection(document_id)
+        document = await get_document_info(document_id, doc_db)
+        document_collection = document_repository.get_collection(document["uuid_number"])
     else:
         document_collection = document_repository.new_collection()
 
@@ -54,7 +57,6 @@ async def process_files(
 
     list_files = []
     async for filename in document_collection.list_files():
-        print(filename)
         list_files.append(filename)
         await text_converter.textify(filename, document_collection)
 
@@ -64,10 +66,9 @@ async def process_files(
     await gpt_indexer.index(document_collection)
     await langchain_indexer.index(document_collection)
 
-    return {
-        "id": document_collection.id,
-        "list_files": list_files
-    }
+    if not document_id:
+        return await doc_db.insert_document(document_name, document_collection.id, list_files)
+    await doc_db.update_document(document_id, list_files)
 
 @router.get(
     "/get-documents",
@@ -88,19 +89,13 @@ async def upload_files(
     authorization: Annotated[User, Depends(verify_access_token)],
     api_key: Annotated[APIKey, Depends(get_api_key)],
     files: List[UploadFile],
-    document_name: str,    
-    document_repository: Annotated[
-        DocumentRepository, Depends(get_document_repository)
-    ],
+    document_name: str,
+    document_repository: Annotated[DocumentRepository, Depends(get_document_repository)],
     text_converter: Annotated[TextConverter, Depends(get_text_converter)],
     doc_db: Annotated[DOCRepository, Depends(get_document_repo)],
 ):
-
-    data = await process_files(files, text_converter, None, document_repository)
-    id = await doc_db.insert_document(document_name, data["id"], data["list_files"])
-
+    id = await process_files(files, None, document_name, document_repository, text_converter, doc_db)
     return {
-        "document_name": document_name, 
         "document_id": id,
         "message": "Files uploading is successful",
     }
@@ -120,13 +115,7 @@ async def update_or_add_document(
     text_converter: Annotated[TextConverter, Depends(get_text_converter)],
     doc_db: Annotated[DOCRepository, Depends(get_document_repo)],
 ):
-    document = await get_document_info(document_id, doc_db)
-
-    print(document[0])
-
-    data = await process_files(files, text_converter, document[0], document_repository)
-    await doc_db.update_document(document_id, data["list_files"])
-
+    await process_files(files, document_id, None, document_repository, text_converter, doc_db)
     return {
         "message": "Document updated successfully",
     }
@@ -144,12 +133,9 @@ async def delete_document(
 
     try:   
         document = await get_document_info(document_id, doc_db)
-        print(document)
-        uuid_no = document[0]
+        uuid_no = document["uuid_number"]
         collection = document_repository.get_collection(uuid_no)
         await collection.remove_file(uuid_no)
-        index = await doc_db.delete_document_by_id(document_id)
-    
         return {
             "message": "Document collection deleted successfully"
         }

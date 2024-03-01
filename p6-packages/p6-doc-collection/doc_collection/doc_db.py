@@ -117,9 +117,9 @@ class DOCRepository:
 
         async with engine.acquire() as connection:
             try:
-                document_uuid, document_name, documents_list = await connection.fetchrow(
+                return await connection.fetchrow(
                     """
-                    SELECT document_store.uuid_number, document_store.document_name, array_agg(file_store.file_name) as documents_list 
+                    SELECT document_store.id as document_id, document_store.uuid_number, document_store.document_name, array_agg(file_store.file_name) as documents_list 
                     FROM document_store
                     JOIN file_store ON document_store.id = file_store.document_id
                     WHERE document_store.id = $1
@@ -127,7 +127,6 @@ class DOCRepository:
                     """,
                     document_id,
                 )
-                return document_uuid, document_name, documents_list
             except Exception as e:
                 return None
 
@@ -138,15 +137,14 @@ class DOCRepository:
 
         async with engine.acquire() as connection:
             try:
-                documents = await connection.fetch(
+                return await connection.fetch(
                     """
-                    SELECT document_store.uuid_number, document_store.document_name, array_agg(file_store.file_name) as documents_list 
+                    SELECT document_store.id as document_id, document_store.uuid_number, document_store.document_name, array_agg(file_store.file_name) as documents_list 
                     FROM document_store
                     JOIN file_store ON document_store.id = file_store.document_id
                     GROUP BY document_store.id, document_store.document_name
                     """
                 )
-                return [(doc[0], doc[1], doc[2], [file[3] for file in doc[4:]]) for doc in documents]
             except Exception as e:
                 print(f"Error fetching all documents: {e}")
                 return None
@@ -182,5 +180,4 @@ class DOCRepository:
 
         async with engine.acquire() as connection:
             row = await connection.fetchrow("SELECT uuid_number FROM document_store WHERE id = $1", document_id)
-
             return row["uuid_number"] if row else None
