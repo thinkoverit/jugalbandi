@@ -1,0 +1,61 @@
+{
+    "html.format.wrapAttributes": "aligned-multiple",
+    "html.format.wrapLineLength": 0,
+    "html.format.indentInnerHtml": true,
+    "html.format.indentHandlebars": true,
+    "git.confirmSync": true,
+    "editor.formatOnPaste": true,
+    "editor.smoothScrolling": true,
+    "editor.cursorBlinking": "smooth",
+    "editor.mouseWheelZoom": true,
+    "editor.wrappingIndent": "deepIndent",
+    "editor.minimap.enabled": false,
+    "editor.wordWrapColumn": 400,
+    "editor.minimap.maxColumn": 200,
+    "editor.detectIndentation": false,
+    "explorer.confirmDelete": false,
+    "explorer.sortOrder": "default",
+    "explorer.confirmDragAndDrop": false,
+    "workbench.editor.highlightModifiedTabs": true,
+    "workbench.iconTheme": "vscode-icons",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "files.trimFinalNewlines": true,
+    "files.autoSave": "onFocusChange",
+    "breadcrumbs.enabled": true,
+    "window.zoomLevel": 0,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "vsicons.projectDetection.autoReload": true,
+    "javascript.referencesCodeLens.enabled": true,
+    "javascript.suggest.completeFunctionCalls": true,
+    "cSpell.language": "en",
+    "scm.defaultViewMode": "tree",
+    // Global tab size
+    "editor.tabSize": 4,
+    "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features",
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false
+    },
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features",
+        "editor.tabSize": 4
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.tabSize": 4
+    },
+    "[scss]": {
+        "editor.tabSize": 4
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.tabSize": 4
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features",
+        "editor.tabSize": 4
+    },
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic"
+}
