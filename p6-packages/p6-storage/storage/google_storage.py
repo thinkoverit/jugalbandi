@@ -268,6 +268,8 @@ class P6GoogleStorage(P6Storage):
             async with GoogleAioStorage(session=session, token=self.token) as client:
                 objects = await client.list_objects(self.bucket_name,
                                                     params={"prefix": full_file_path})
+                
+                print(objects)
                 for blob in objects['items']:
                     await client.delete(self.bucket_name, blob['name'])
 

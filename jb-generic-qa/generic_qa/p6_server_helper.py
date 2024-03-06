@@ -151,6 +151,16 @@ class User(BaseModel):
     username: str
     email: str | None = None
 
+class UserRequest(BaseModel):
+    username: str
+    password: str | None = None
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    refresh_token: str
+    status_code: str
+
 
 api_key_header = APIKeyHeader(name="api_key", auto_error=False)
 
